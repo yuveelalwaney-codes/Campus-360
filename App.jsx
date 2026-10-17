@@ -4,7 +4,7 @@ const INLINE_STYLES = `
   @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
   :root {
     --bg-base: #060913;
-    --card-surface: rgba(13, 20, 38, 0.8);
+    --card-surface: rgba(13, 20, 38, 0.82);
     --border-subtle: rgba(56, 189, 248, 0.15);
     --accent-cyan: #38bdf8;
     --accent-emerald: #10b981;
@@ -74,6 +74,32 @@ const STUDY_MATERIALS = [
   { id: 5, title: 'Orthographic & Isometric Projection Sheets', sub: 'EVL-105', type: 'CAD Drawings', size: '8.6 MB', author: 'Prof. VS' }
 ];
 
+// Councils Data
+const COUNCILS_LIST = [
+  { id: 'questit', name: 'QuestIT', badge: 'Tech & Code', color: '#38bdf8', venue: 'IT Lab 406 & CC 10A', desc: 'IT Dept Coding Chapter, Hackathons & Tech Sprints' },
+  { id: 'sports', name: 'Sports Council', badge: 'Athletics', color: '#f59e0b', venue: 'Campus Grounds & Turf', desc: 'Inter-dept Futsal, Cricket, Athletics & Sphurti' },
+  { id: 'sort', name: 'SORT Council', badge: 'Social Outreach', color: '#10b981', venue: 'Admin Cell & Quadrangle', desc: 'Blood Donation Drives, NGO Campaigns & Rural Uplift' },
+  { id: 'circle', name: 'VESIT Circle', badge: 'Cultural & Arts', color: '#ec4899', venue: 'Campus Amphitheatre', desc: 'Utsav Flagship, Jam Sessions & Dramatic Productions' },
+  { id: 'veslit', name: 'VESLit Circle', badge: 'Debate & MUN', color: '#a855f7', venue: 'Smart Class 517', desc: 'Model United Nations, Parliamentary Debates & Elocution' },
+  { id: 'veslang', name: 'VESLang Circle', badge: 'Linguistics', color: '#6366f1', venue: 'Language Lab 312', desc: 'Japanese, German & Global Language Workshops' }
+];
+
+const INITIAL_EVENTS = [
+  { id: 1, title: 'QuestIT 2026: 24-Hour IT Hackathon', council: 'questit', date: 'Oct 24, 09:00 AM', venue: 'IT Labs 406 & 501', stage: 'Registration Open', registered: true, rewardCredits: 2 },
+  { id: 2, title: 'Sphurti Inter-Dept Futsal Championship', council: 'sports', date: 'Oct 21, 04:30 PM', venue: 'VES Turf Ground', stage: 'Starting Soon', registered: false, rewardCredits: 1 },
+  { id: 3, title: 'SORT Campus Blood Donation & Thalassemia Camp', council: 'sort', date: 'Oct 26, 09:30 AM', venue: 'Auditorium Quadrangle', stage: 'Registration Open', registered: false, rewardCredits: 3 },
+  { id: 4, title: 'VESLit National Mock Parliament Simulation', council: 'veslit', date: 'Oct 22, 02:00 PM', venue: 'Seminar Hall 1', stage: 'Registration Open', registered: false, rewardCredits: 1 },
+  { id: 5, title: 'VESLang Japanese Hiragana & Kanji Bootcamp', council: 'veslang', date: 'Oct 23, 03:45 PM', venue: 'Smart Class 517', stage: 'Starting Soon', registered: false, rewardCredits: 1 },
+  { id: 6, title: 'VESIT Circle Acoustic Jam Night & Auditions', council: 'circle', date: 'Live Right Now', venue: 'Amphitheatre', stage: 'Live', registered: false, rewardCredits: 1 }
+];
+
+const CREDIT_MARKET_ITEMS = [
+  { id: 'c1', title: '1-on-1 Senior Peer Tutoring Session', cost: 1, type: 'Academic', desc: 'Book 1 hour of personalized doubt solving with an IT senior tutor.' },
+  { id: 'c2', title: 'Fast-Track Lab Hardware Kit Reservation', cost: 2, type: 'Facility', desc: 'Reserve BEE machine benches or advanced microprocessor kits early.' },
+  { id: 'c3', title: 'Library Dedicated Quiet Study Pod Access', cost: 1, type: 'Campus Pod', desc: 'Book private air-conditioned study cubicle on the 2nd Floor.' },
+  { id: 'c4', title: 'Hackathon VIP Mentor Review Slot', cost: 2, type: 'QuestIT', desc: 'Guaranteed 30-min architecture critique with alumni mentors.' }
+];
+
 function TiltBox({ children, style = {}, className = '' }) {
   const ref = useRef(null);
   const handleMouseMove = (e) => {
@@ -81,7 +107,7 @@ function TiltBox({ children, style = {}, className = '' }) {
     const rect = ref.current.getBoundingClientRect();
     const x = e.clientX - rect.left - rect.width / 2;
     const y = e.clientY - rect.top - rect.height / 2;
-    ref.current.style.transform = `rotateX(${-(y / (rect.height / 2)) * 6.5}deg) rotateY(${(x / (rect.width / 2)) * 6.5}deg) translateZ(8px)`;
+    ref.current.style.transform = `rotateX(${-(y / (rect.height / 2)) * 6}deg) rotateY(${(x / (rect.width / 2)) * 6}deg) translateZ(6px)`;
   };
   const handleMouseLeave = () => {
     if (ref.current) ref.current.style.transform = 'rotateX(0deg) rotateY(0deg) translateZ(0px)';
@@ -116,12 +142,14 @@ export default function Campus360App() {
   const [tab, setTab] = useState('desktop');
   const [activeRoute, setActiveRoute] = useState('campus');
   const [resourceFilter, setResourceFilter] = useState('All');
+  const [selectedCouncil, setSelectedCouncil] = useState('all');
 
   const [subjects, setSubjects] = useState(INITIAL_SUBJECTS);
   const [personalTargetSGPA, setPersonalTargetSGPA] = useState(8.8);
   const [timeCredits, setTimeCredits] = useState(4);
   const [classPoints, setClassPoints] = useState(175);
   const [burstCelebration, setBurstCelebration] = useState(false);
+  const [celebrationMsg, setCelebrationMsg] = useState('');
 
   const mapRef = useRef(null);
   const mapInstance = useRef(null);
@@ -133,11 +161,7 @@ export default function Campus360App() {
   ]);
   const [newRide, setNewRide] = useState({ route: 'Chembur Station -> VESIT Gate 1', time: '08:30 AM', seats: 2, pickup: 'Main Gate 1' });
 
-  const [events, setEvents] = useState([
-    { id: 1, title: 'VESIT Annual Hackathon: QuestIT 2026', org: 'IT Dept & CSI', date: 'Oct 24, 09:00 AM', venue: 'Amphitheatre', stage: 'Registration Open', registered: true },
-    { id: 2, title: 'Freshers Git & Linux Boot Camp', org: 'Tinkers Club', date: 'Oct 19, 04:00 PM', venue: 'CC Lab 10A', stage: 'Starting Soon', registered: false },
-    { id: 3, title: 'Competitive Coding Sprint 1', org: 'CodeCell', date: 'Live Right Now', venue: 'Lab 406', stage: 'Live', registered: false }
-  ]);
+  const [events, setEvents] = useState(INITIAL_EVENTS);
   const [challenges, setChallenges] = useState([
     { id: 1, title: 'Submit C Lab 3 (Pointers & Structs)', reward: 30, completed: false, badge: 'Tech' },
     { id: 2, title: 'Complete BEE Virtual Simulation', reward: 25, completed: true, badge: 'Circuits' },
@@ -251,6 +275,7 @@ export default function Campus360App() {
     map.fitBounds(layerGroup.current.getBounds(), { padding: [40, 40] });
   };
 
+  // Personalized SGPA & What-If Engine
   const personalizedAnalytics = useMemo(() => {
     let totalCredits = 0;
     let earnedGradePoints = 0;
@@ -308,6 +333,36 @@ export default function Campus360App() {
       booked: false
     }, ...rides]);
     setClassPoints((p) => p + 20);
+    setCelebrationMsg('Ride Published! +20 Class Points rewarded.');
+    setBurstCelebration(true);
+    setTimeout(() => setBurstCelebration(false), 2400);
+  };
+
+  // Council Event Registration Action
+  const toggleEventReg = (ev) => {
+    setEvents(events.map((e) => {
+      if (e.id === ev.id) {
+        if (!e.registered) {
+          setTimeCredits((c) => c + e.rewardCredits);
+          setClassPoints((p) => p + 30);
+          setCelebrationMsg(`Registered for ${e.title}! +${e.rewardCredits} Credits Added.`);
+          setBurstCelebration(true);
+          setTimeout(() => setBurstCelebration(false), 2400);
+        }
+        return { ...e, registered: !e.registered };
+      }
+      return e;
+    }));
+  };
+
+  // Spend Credits Action
+  const handleRedeemCredit = (item) => {
+    if (timeCredits < item.cost) {
+      alert(`Need ${item.cost} credits. You currently have ${timeCredits}. Teach a peer or participate in council events to earn more!`);
+      return;
+    }
+    setTimeCredits((c) => c - item.cost);
+    setCelebrationMsg(`Redeemed: ${item.title} (-${item.cost} Credits)`);
     setBurstCelebration(true);
     setTimeout(() => setBurstCelebration(false), 2400);
   };
@@ -316,6 +371,7 @@ export default function Campus360App() {
     <>
       <style>{INLINE_STYLES}</style>
 
+      {/* Live OTP Toast Simulator */}
       {otpNotification && (
         <div style={{ position: 'fixed', top: '16px', left: '50%', transform: 'translateX(-50%)', zIndex: 9999, background: '#111827', border: '1px solid #38bdf8', padding: '14px 20px', borderRadius: '14px', display: 'flex', alignItems: 'center', gap: '14px', boxShadow: '0 10px 30px rgba(0,0,0,0.8)' }}>
           <div>
@@ -328,9 +384,10 @@ export default function Campus360App() {
         </div>
       )}
 
+      {/* Action Notification */}
       {burstCelebration && (
         <div style={{ position: 'fixed', top: '24px', left: '50%', transform: 'translateX(-50%)', zIndex: 9999, background: 'linear-gradient(135deg, #10b981, #0284c7)', color: '#fff', padding: '10px 24px', borderRadius: '30px', fontWeight: 'bold', fontSize: '13px', boxShadow: '0 0 25px rgba(16,185,129,0.7)' }}>
-          Action Complete! +20 Class Points rewarded.
+          🎉 {celebrationMsg || 'Action Complete! Credits & Points updated.'}
         </div>
       )}
 
@@ -346,7 +403,7 @@ export default function Campus360App() {
               </div>
               <div style={{ textAlign: 'center', marginBottom: '20px' }}>
                 <h2 style={{ margin: 0, fontSize: '24px', fontWeight: '800' }}>Campus<span style={{ color: '#38bdf8' }}>360</span></h2>
-                <small style={{ color: '#94a3b8' }}>VESIT Identity & Academic Portal</small>
+                <small style={{ color: '#94a3b8' }}>VESIT Identity & Academic Portal[cite: 1, 2]</small>
               </div>
 
               <div style={{ display: 'flex', background: '#070b14', padding: '4px', borderRadius: '10px', marginBottom: '16px', border: '1px solid #1e293b' }}>
@@ -370,7 +427,7 @@ export default function Campus360App() {
                     <input required type="text" placeholder="Faculty Name" value={identifier} onChange={(e) => setIdentifier(e.target.value)} style={{ padding: '10px', background: '#070b14', color: '#fff', borderRadius: '8px', border: '1px solid #334155' }} />
                   )}
                   <input required type="tel" placeholder="Mobile Number (10 Digits)" value={phone} onChange={(e) => setPhone(e.target.value)} style={{ padding: '10px', background: '#070b14', color: '#fff', borderRadius: '8px', border: '1px solid #334155' }} />
-                  <button type="submit" style={{ background: '#0284c7', color: '#fff', border: 'none', padding: '12px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>Send SMS OTP</button>
+                  <button type="submit" style={{ background: '#0284c7', color: '#fff', border: 'none', padding: '12px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>Send SMS OTP[cite: 1, 2]</button>
                 </form>
               ) : (
                 <form onSubmit={handleVerifyOtp} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
@@ -395,22 +452,23 @@ export default function Campus360App() {
               <div style={{ fontSize: '11px', color: '#94a3b8' }}>{session.name} ({session.idTag})</div>
             </div>
             <div style={{ display: 'flex', gap: '14px', alignItems: 'center' }}>
-              <span style={{ color: '#38bdf8', fontSize: '13px' }}>Time Credits: <strong>{timeCredits}</strong></span>
-              <span style={{ color: '#facc15', fontSize: '13px' }}>Class Pts: <strong>{classPoints}</strong></span>
+              <span style={{ color: '#38bdf8', fontSize: '13px' }}>⏳ Time Credits: <strong>{timeCredits}</strong>[cite: 1]</span>
+              <span style={{ color: '#facc15', fontSize: '13px' }}>🏆 Class Pts: <strong>{classPoints}</strong>[cite: 1]</span>
               <button onClick={() => setSession(null)} style={{ background: '#1e293b', border: '1px solid #334155', color: '#cbd5e1', padding: '5px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '12px' }}>Exit</button>
             </div>
           </header>
 
           <nav style={{ display: 'flex', gap: '8px', padding: '10px 28px', background: '#070b14', borderBottom: '1px solid rgba(255,255,255,0.05)', overflowX: 'auto' }}>
             {[
-              { id: 'desktop', label: 'Main Dashboard' },
-              { id: 'academic', label: 'Personalized SGPA Calculator' },
-              { id: 'resources', label: 'Study Vault' },
-              { id: 'rides', label: 'Ride Creation' },
-              { id: 'map', label: 'Campus & Routes' },
-              { id: 'events', label: 'Events' },
-              { id: 'challenges', label: 'Challenges' },
-              { id: 'contacts', label: 'Contacts' }
+              { id: 'desktop', label: '🖥️ Main Desktop Dashboard' },
+              { id: 'academic', label: '📊 Personalized SGPA Calculator' },
+              { id: 'events', label: '🎟️ Council Events' },
+              { id: 'credits', label: '⚡ Spend & Earn Credits' },
+              { id: 'resources', label: '📚 Study Vault' },
+              { id: 'rides', label: '🚗 Ride Creation' },
+              { id: 'map', label: '🗺️ Campus & Routes' },
+              { id: 'challenges', label: '🏅 Challenges' },
+              { id: 'contacts', label: '📞 Contacts' }
             ].map((t) => (
               <button key={t.id} onClick={() => setTab(t.id)} style={{ background: tab === t.id ? '#0284c7' : 'transparent', color: tab === t.id ? '#fff' : '#94a3b8', border: tab === t.id ? '1px solid #38bdf8' : 'none', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', fontSize: '13px', fontWeight: tab === t.id ? 'bold' : 'normal', whiteSpace: 'nowrap' }}>
                 {t.label}
@@ -420,26 +478,27 @@ export default function Campus360App() {
 
           <main style={{ maxWidth: '1080px', margin: '24px auto', padding: '0 16px' }} className="perspective-view">
             
+            {/* 1. DESKTOP DASHBOARD */}
             {tab === 'desktop' && (
               <div className="stage-animate" style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
                 <TiltBox style={{ padding: '22px', borderLeft: '6px solid #f43f5e', border: '1px solid rgba(244,63,94,0.3)' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
                     <div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <h3 style={{ margin: 0, color: '#f8fafc', fontSize: '17px' }}>Academic Attention Radar</h3>
+                        <h3 style={{ margin: 0, color: '#f8fafc', fontSize: '17px' }}>🚨 Academic Attention Radar[cite: 1]</h3>
                         <span style={{ fontSize: '11px', background: 'rgba(244,63,94,0.2)', color: '#f87171', padding: '2px 8px', borderRadius: '10px', fontWeight: 'bold' }}>
                           {personalizedAnalytics.attentionCount} Modules At Risk
                         </span>
                       </div>
                       <p style={{ margin: '4px 0 0', fontSize: '13px', color: '#cbd5e1' }}>
                         {personalizedAnalytics.attentionCount > 0
-                          ? 'BEE-103 requires high End-Sem cutoff. Check your Personalized SGPA Calculator for targeted what-if marks.'
-                          : 'All modules are on track for your personalized SGPA target!'}
+                          ? 'BEE-103 is flagged at risk. Check your Personalized SGPA Calculator to adjust your preparation confidence.'[cite: 1]
+                          : 'All modules are on track for your personalized SGPA target!'[cite: 1]}
                       </p>
                     </div>
                     <div style={{ display: 'flex', gap: '8px' }}>
-                      <button onClick={() => setTab('academic')} style={{ background: '#1e293b', border: '1px solid #334155', color: '#fff', padding: '8px 14px', borderRadius: '8px', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}>SGPA Calculator</button>
-                      <button onClick={() => setTab('resources')} style={{ background: '#0284c7', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}>Study Vault</button>
+                      <button onClick={() => setTab('academic')} style={{ background: '#1e293b', border: '1px solid #334155', color: '#fff', padding: '8px 14px', borderRadius: '8px', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}>SGPA Calculator →</button>
+                      <button onClick={() => setTab('events')} style={{ background: '#0284c7', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}>Council Events</button>
                     </div>
                   </div>
                 </TiltBox>
@@ -448,7 +507,7 @@ export default function Campus360App() {
                   <TiltBox style={{ padding: '18px' }}>
                     <div style={{ fontSize: '11px', color: '#94a3b8', fontWeight: 'bold' }}>PROJECTED SGPA</div>
                     <div style={{ fontSize: '28px', fontWeight: 'bold', color: personalizedAnalytics.isGoalMet ? '#10b981' : '#f59e0b', marginTop: '4px' }} className="mono">
-                      {personalizedAnalytics.projectedSGPA}
+                      {personalizedAnalytics.projectedSGPA}[cite: 1]
                     </div>
                     <small style={{ color: '#94a3b8', fontSize: '11px' }}>Goal: {personalTargetSGPA} SGPA</small>
                   </TiltBox>
@@ -464,15 +523,15 @@ export default function Campus360App() {
                   <TiltBox style={{ padding: '18px' }}>
                     <div style={{ fontSize: '11px', color: '#94a3b8', fontWeight: 'bold' }}>PEER TIME CREDITS</div>
                     <div style={{ fontSize: '28px', fontWeight: 'bold', color: '#38bdf8', marginTop: '4px' }} className="mono">
-                      {timeCredits} hrs
+                      {timeCredits} hrs[cite: 1]
                     </div>
-                    <small style={{ color: '#94a3b8', fontSize: '11px' }}>1 hr taught = +1 credit</small>
+                    <small style={{ color: '#94a3b8', fontSize: '11px' }}>Spend on peer tutoring & pods[cite: 1, 3]</small>
                   </TiltBox>
 
                   <TiltBox style={{ padding: '18px' }}>
-                    <div style={{ fontSize: '11px', color: '#94a3b8', fontWeight: 'bold' }}>OPEN CAMPUS RIDES</div>
+                    <div style={{ fontSize: '11px', color: '#94a3b8', fontWeight: 'bold' }}>CAMPUS RIDES</div>
                     <div style={{ fontSize: '28px', fontWeight: 'bold', color: '#facc15', marginTop: '4px' }} className="mono">
-                      {rides.length} Available
+                      {rides.length} Open[cite: 1]
                     </div>
                     <small style={{ color: '#38bdf8', fontSize: '11px' }}>Chembur & Kurla stations</small>
                   </TiltBox>
@@ -480,12 +539,12 @@ export default function Campus360App() {
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                   <TiltBox style={{ padding: '20px' }}>
-                    <h3 style={{ margin: '0 0 12px', fontSize: '16px', color: '#38bdf8' }}>Today's Lecture Schedule ({div})</h3>
+                    <h3 style={{ margin: '0 0 12px', fontSize: '16px', color: '#38bdf8' }}>📅 Today's Lecture Schedule ({div})[cite: 4, 5]</h3>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                       {(SCHEDULE[div] || SCHEDULE.D5A).map((p, idx) => (
                         <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 12px', background: '#070b14', borderRadius: '8px', border: '1px solid #1e293b' }}>
-                          <span><strong>{p.time}</strong> — {p.sub}</span>
-                          <span style={{ color: '#38bdf8' }}>{p.room}</span>
+                          <span><strong>{p.time}</strong> — {p.sub}[cite: 4, 5]</span>
+                          <span style={{ color: '#38bdf8' }}>{p.room}[cite: 4, 5]</span>
                         </div>
                       ))}
                     </div>
@@ -493,17 +552,17 @@ export default function Campus360App() {
 
                   <TiltBox style={{ padding: '20px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                      <h3 style={{ margin: 0, fontSize: '16px', color: '#f8fafc' }}>Active Campus Pools</h3>
-                      <button onClick={() => setTab('rides')} style={{ background: 'none', border: 'none', color: '#38bdf8', fontSize: '12px', cursor: 'pointer', fontWeight: 'bold' }}>View All</button>
+                      <h3 style={{ margin: 0, fontSize: '16px', color: '#f8fafc' }}>🎟️ Live Upcoming Events[cite: 1]</h3>
+                      <button onClick={() => setTab('events')} style={{ background: 'none', border: 'none', color: '#38bdf8', fontSize: '12px', cursor: 'pointer', fontWeight: 'bold' }}>All Councils →</button>
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                      {rides.slice(0, 3).map((r) => (
-                        <div key={r.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 12px', background: '#070b14', borderRadius: '8px', border: '1px solid #1e293b' }}>
+                      {events.slice(0, 3).map((e) => (
+                        <div key={e.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 12px', background: '#070b14', borderRadius: '8px', border: '1px solid #1e293b' }}>
                           <div>
-                            <strong>{r.route}</strong>
-                            <div style={{ fontSize: '11px', color: '#94a3b8' }}>{r.driver} • {r.time}</div>
+                            <strong>{e.title}</strong>
+                            <div style={{ fontSize: '11px', color: '#94a3b8' }}>{e.venue} • {e.date}</div>
                           </div>
-                          <span style={{ fontSize: '11px', color: r.seats > 0 ? '#10b981' : '#f43f5e', fontWeight: 'bold' }}>{r.seats > 0 ? `${r.seats} seats` : 'Full'}</span>
+                          <span style={{ fontSize: '11px', color: '#10b981', fontWeight: 'bold' }}>+{e.rewardCredits} Cr</span>
                         </div>
                       ))}
                     </div>
@@ -512,6 +571,7 @@ export default function Campus360App() {
               </div>
             )}
 
+            {/* 2. PERSONALIZED SGPA CALCULATOR */}
             {tab === 'academic' && (
               <div className="stage-animate" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 <TiltBox style={{ padding: '24px' }}>
@@ -519,7 +579,7 @@ export default function Campus360App() {
                     <div>
                       <h2 style={{ margin: 0, color: '#f8fafc', fontSize: '20px' }}>Personalized SGPA & What-If Calculator</h2>
                       <p style={{ margin: '4px 0 0', fontSize: '13px', color: '#94a3b8' }}>
-                        Customize your internal marks (/30), desired grade, and exam confidence to forecast required End-Sem scores (/70).
+                        Set your target goal, input internal marks (/30), choose desired grades, and simulate required End-Sem scores (/70)[cite: 1, 2].
                       </p>
                     </div>
 
@@ -536,7 +596,7 @@ export default function Campus360App() {
                         style={{ width: '60px', padding: '6px', background: '#0b1324', color: '#38bdf8', border: '1px solid #0284c7', borderRadius: '6px', fontWeight: 'bold', textAlign: 'center' }}
                       />
                       <span style={{ fontSize: '12px', color: personalizedAnalytics.isGoalMet ? '#10b981' : '#f59e0b', fontWeight: 'bold' }}>
-                        {personalizedAnalytics.isGoalMet ? 'Goal Met' : 'Under Goal'}
+                        {personalizedAnalytics.isGoalMet ? 'Goal Met ✓' : 'Under Goal'}
                       </span>
                     </div>
                   </div>
@@ -591,7 +651,7 @@ export default function Campus360App() {
 
                             <div style={{ textAlign: 'right', minWidth: '130px' }}>
                               <div style={{ color: sub.color, fontWeight: 'bold', fontSize: '13px' }}>
-                                Need: {sub.neededInEndSem}/70
+                                Need: {sub.neededInEndSem}/70[cite: 1]
                               </div>
                               <span style={{ fontSize: '11px', color: sub.achievable ? '#10b981' : '#f43f5e' }}>
                                 {sub.achievable ? `Probability: ${sub.prob}%` : 'Impossible (>70)'}
@@ -623,6 +683,123 @@ export default function Campus360App() {
               </div>
             )}
 
+            {/* 3. COUNCIL EVENTS SECTION (UPDATED WITH ALL COUNCILS) */}
+            {tab === 'events' && (
+              <div className="stage-animate" style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+                <div>
+                  <h3 style={{ margin: '0 0 12px', color: '#38bdf8', fontSize: '18px' }}>VESIT Student Councils & Societies</h3>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '14px' }}>
+                    {COUNCILS_LIST.map((c) => (
+                      <TiltBox key={c.id} style={{ padding: '18px', borderLeft: `5px solid ${c.color}` }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <strong style={{ fontSize: '16px', color: '#f8fafc' }}>{c.name}</strong>
+                          <span style={{ fontSize: '10px', background: `${c.color}25`, color: c.color, border: `1px solid ${c.color}`, padding: '2px 8px', borderRadius: '4px', fontWeight: 'bold' }}>
+                            {c.badge}
+                          </span>
+                        </div>
+                        <div style={{ fontSize: '12px', color: '#cbd5e1', margin: '6px 0 2px' }}>{c.desc}</div>
+                        <div style={{ fontSize: '11px', color: '#94a3b8' }}>📍 {c.venue}</div>
+                        <button
+                          onClick={() => setSelectedCouncil(c.id)}
+                          style={{ marginTop: '10px', width: '100%', background: selectedCouncil === c.id ? c.color : '#1e293b', color: selectedCouncil === c.id ? '#000' : '#fff', border: `1px solid ${c.color}`, padding: '6px', borderRadius: '6px', fontSize: '11px', fontWeight: 'bold', cursor: 'pointer' }}
+                        >
+                          {selectedCouncil === c.id ? 'Filtered Events ✓' : 'Filter Council Events'}
+                        </button>
+                      </TiltBox>
+                    ))}
+                  </div>
+                </div>
+
+                <TiltBox style={{ padding: '22px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', marginBottom: '16px' }}>
+                    <h3 style={{ margin: 0, color: '#f8fafc', fontSize: '18px' }}>Council Events Feed[cite: 1]</h3>
+                    <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                      <button onClick={() => setSelectedCouncil('all')} style={{ background: selectedCouncil === 'all' ? '#0284c7' : '#070b14', color: '#fff', border: '1px solid #334155', padding: '5px 12px', borderRadius: '6px', fontSize: '11px', cursor: 'pointer', fontWeight: 'bold' }}>All Councils</button>
+                      {COUNCILS_LIST.map((c) => (
+                        <button key={c.id} onClick={() => setSelectedCouncil(c.id)} style={{ background: selectedCouncil === c.id ? c.color : '#070b14', color: selectedCouncil === c.id ? '#000' : '#94a3b8', border: '1px solid #334155', padding: '5px 10px', borderRadius: '6px', fontSize: '11px', fontWeight: 'bold', cursor: 'pointer' }}>{c.name}</button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    {events.filter((e) => selectedCouncil === 'all' || e.council === selectedCouncil).map((ev) => {
+                      const councilObj = COUNCILS_LIST.find((c) => c.id === ev.council) || {};
+                      const stageColor = ev.stage === 'Live' ? '#ef4444' : ev.stage === 'Starting Soon' ? '#f59e0b' : '#10b981';
+                      return (
+                        <div key={ev.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#070b14', padding: '14px 18px', borderRadius: '10px', border: '1px solid #1e293b', borderLeft: `5px solid ${councilObj.color || '#38bdf8'}` }}>
+                          <div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                              <strong>{ev.title}</strong>
+                              <span style={{ fontSize: '10px', background: `${stageColor}20`, color: stageColor, padding: '2px 8px', borderRadius: '4px', border: `1px solid ${stageColor}` }}>{ev.stage}[cite: 1]</span>
+                            </div>
+                            <div style={{ fontSize: '12px', color: '#94a3b8', marginTop: '4px' }}>
+                              📍 {ev.venue} • 🗓️ {ev.date} • Award: <strong style={{ color: '#38bdf8' }}>+{ev.rewardCredits} Credits</strong>
+                            </div>
+                          </div>
+                          {ev.stage !== 'Ended' && (
+                            <button onClick={() => toggleEventReg(ev)} style={{ background: ev.registered ? '#1e293b' : '#0284c7', color: ev.registered ? '#38bdf8' : '#fff', border: ev.registered ? '1px solid #0284c7' : 'none', padding: '8px 16px', borderRadius: '8px', fontSize: '12px', fontWeight: 'bold', cursor: 'pointer' }}>
+                              {ev.registered ? 'Registered ✓' : `Register (+${ev.rewardCredits} Cr)`}
+                            </button>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </TiltBox>
+              </div>
+            )}
+
+            {/* 4. WHERE CREDITS CAN BE USED & EARNED */}
+            {tab === 'credits' && (
+              <div className="stage-animate" style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+                <TiltBox style={{ padding: '22px' }}>
+                  <h3 style={{ margin: '0 0 6px', color: '#38bdf8' }}>⚡ Credit Exchange: Where to Use & Spend Credits[cite: 1, 3]</h3>
+                  <p style={{ margin: '0 0 16px', fontSize: '13px', color: '#94a3b8' }}>
+                    Redeem your earned time credits for senior 1:1 tutoring, lab facilities, and study pods[cite: 1, 3].
+                  </p>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '14px' }}>
+                    {CREDIT_MARKET_ITEMS.map((item) => (
+                      <div key={item.id} style={{ background: '#070b14', padding: '16px', borderRadius: '12px', border: '1px solid #1e293b', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                        <div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <span style={{ fontSize: '11px', background: 'rgba(56, 189, 248, 0.1)', color: '#38bdf8', padding: '2px 8px', borderRadius: '4px', fontWeight: 'bold' }}>{item.type}</span>
+                            <span style={{ fontSize: '12px', color: '#facc15', fontWeight: 'bold' }}>Cost: {item.cost} Cr[cite: 1]</span>
+                          </div>
+                          <strong style={{ fontSize: '14px', color: '#f8fafc', display: 'block', margin: '8px 0 4px' }}>{item.title}</strong>
+                          <p style={{ fontSize: '12px', color: '#94a3b8', margin: 0 }}>{item.desc}</p>
+                        </div>
+                        <button
+                          onClick={() => handleRedeemCredit(item)}
+                          style={{ marginTop: '12px', background: '#0284c7', color: '#fff', border: 'none', padding: '8px', borderRadius: '6px', fontSize: '12px', fontWeight: 'bold', cursor: 'pointer' }}
+                        >
+                          Redeem Slot ({item.cost} Cr)[cite: 1]
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </TiltBox>
+
+                <TiltBox style={{ padding: '22px' }}>
+                  <h3 style={{ margin: '0 0 12px', color: '#10b981' }}>How to Earn More Credits</h3>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+                    <div style={{ background: '#070b14', padding: '16px', borderRadius: '10px', border: '1px solid #1e293b' }}>
+                      <strong style={{ color: '#38bdf8' }}>1. Teach a Peer (1 hr = +1 Credit)[cite: 1, 3]</strong>
+                      <p style={{ fontSize: '12px', color: '#94a3b8', margin: '6px 0 10px' }}>Tutor freshmen in C Programming or BEE theorems.</p>
+                      <button onClick={() => { setTimeCredits((c) => c + 1); setClassPoints((p) => p + 25); setCelebrationMsg('Tutored a Peer! +1 Credit added.'); setBurstCelebration(true); setTimeout(() => setBurstCelebration(false), 2400); }} style={{ background: '#10b981', color: '#fff', border: 'none', padding: '6px 12px', borderRadius: '6px', fontSize: '12px', fontWeight: 'bold', cursor: 'pointer' }}>+ Log Peer Tutoring (+1 Cr)[cite: 1]</button>
+                    </div>
+
+                    <div style={{ background: '#070b14', padding: '16px', borderRadius: '10px', border: '1px solid #1e293b' }}>
+                      <strong style={{ color: '#f59e0b' }}>2. Attend Council Events (+1 to +3 Credits)</strong>
+                      <p style={{ fontSize: '12px', color: '#94a3b8', margin: '6px 0 10px' }}>Register and participate in SORT drives, QuestIT hackathons, or VESLit debates.</p>
+                      <button onClick={() => setTab('events')} style={{ background: '#1e293b', border: '1px solid #334155', color: '#38bdf8', padding: '6px 12px', borderRadius: '6px', fontSize: '12px', fontWeight: 'bold', cursor: 'pointer' }}>Browse Council Events →</button>
+                    </div>
+                  </div>
+                </TiltBox>
+              </div>
+            )}
+
+            {/* 5. STUDY VAULT */}
             {tab === 'resources' && (
               <div className="stage-animate" style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                 <TiltBox style={{ padding: '20px' }}>
@@ -649,10 +826,11 @@ export default function Campus360App() {
               </div>
             )}
 
+            {/* 6. RIDE CREATION */}
             {tab === 'rides' && (
               <div className="stage-animate" style={{ display: 'grid', gridTemplateColumns: 'minmax(300px, 340px) 1fr', gap: '20px', alignItems: 'start' }}>
                 <TiltBox style={{ padding: '20px' }}>
-                  <h3 style={{ margin: '0 0 12px', color: '#38bdf8' }}>Offer a Campus Ride</h3>
+                  <h3 style={{ margin: '0 0 12px', color: '#38bdf8' }}>Offer a Campus Ride[cite: 1]</h3>
                   <form onSubmit={handlePublishRide} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                     <select value={newRide.route} onChange={(e) => setNewRide({ ...newRide, route: e.target.value })} style={{ padding: '10px', background: '#070b14', color: '#fff', border: '1px solid #334155', borderRadius: '8px' }}>
                       <option value="Chembur Station -> VESIT Gate 1">Chembur Station -> VESIT Gate 1</option>
@@ -661,7 +839,7 @@ export default function Campus360App() {
                     <input required type="text" placeholder="Departure Time (e.g. 08:30 AM)" value={newRide.time} onChange={(e) => setNewRide({ ...newRide, time: e.target.value })} style={{ padding: '10px', background: '#070b14', color: '#fff', border: '1px solid #334155', borderRadius: '8px' }} />
                     <input required type="text" placeholder="Pickup Landmark" value={newRide.pickup} onChange={(e) => setNewRide({ ...newRide, pickup: e.target.value })} style={{ padding: '10px', background: '#070b14', color: '#fff', border: '1px solid #334155', borderRadius: '8px' }} />
                     <input type="number" min="1" max="4" value={newRide.seats} onChange={(e) => setNewRide({ ...newRide, seats: e.target.value })} style={{ padding: '10px', background: '#070b14', color: '#fff', border: '1px solid #334155', borderRadius: '8px' }} />
-                    <button type="submit" style={{ background: '#0284c7', color: '#fff', border: 'none', padding: '10px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>Publish Ride (+20 Pts)</button>
+                    <button type="submit" style={{ background: '#0284c7', color: '#fff', border: 'none', padding: '10px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>Publish Ride (+20 Pts)[cite: 1]</button>
                   </form>
                 </TiltBox>
 
@@ -670,11 +848,11 @@ export default function Campus360App() {
                     <TiltBox key={r.id} style={{ padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <div>
                         <strong>{r.route}</strong>
-                        <div style={{ fontSize: '12px', color: '#cbd5e1', marginTop: '2px' }}>{r.driver} ({r.role}) • {r.time} • {r.pickup}</div>
+                        <div style={{ fontSize: '12px', color: '#cbd5e1', marginTop: '2px' }}>{r.driver} ({r.role}) • {r.time} • 📍 {r.pickup}</div>
                         <div style={{ fontSize: '11px', color: r.seats > 0 ? '#10b981' : '#f43f5e', marginTop: '4px' }}>{r.seats > 0 ? `${r.seats} seats available` : 'Full'}</div>
                       </div>
                       <button onClick={() => setRides(rides.map((x) => x.id === r.id ? { ...x, booked: !x.booked, seats: x.booked ? x.seats + 1 : x.seats - 1 } : x))} style={{ background: r.booked ? '#f43f5e' : '#0284c7', color: '#fff', border: 'none', padding: '8px 14px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>
-                        {r.booked ? 'Cancel' : 'Request Seat'}
+                        {r.booked ? 'Cancel' : 'Request Seat[cite: 1]'}
                       </button>
                     </TiltBox>
                   ))}
@@ -682,6 +860,7 @@ export default function Campus360App() {
               </div>
             )}
 
+            {/* 7. MAPS & NAVIGATION */}
             {tab === 'map' && (
               <div className="stage-animate" style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                 <TiltBox style={{ padding: '20px' }}>
@@ -701,33 +880,19 @@ export default function Campus360App() {
               </div>
             )}
 
-            {tab === 'events' && (
-              <div className="stage-animate" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                {events.map((ev) => (
-                  <TiltBox key={ev.id} style={{ padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div>
-                      <strong style={{ fontSize: '15px' }}>{ev.title}</strong>
-                      <div style={{ fontSize: '12px', color: '#94a3b8', marginTop: '3px' }}>{ev.org} • {ev.venue} • {ev.date}</div>
-                    </div>
-                    <button onClick={() => setEvents(events.map((e) => e.id === ev.id ? { ...e, registered: !e.registered } : e))} style={{ background: ev.registered ? '#1e293b' : '#0284c7', color: ev.registered ? '#38bdf8' : '#fff', border: 'none', padding: '8px 14px', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer' }}>
-                      {ev.registered ? 'Registered' : 'Register'}
-                    </button>
-                  </TiltBox>
-                ))}
-              </div>
-            )}
-
+            {/* 8. CHALLENGES */}
             {tab === 'challenges' && (
               <div className="stage-animate" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 {challenges.map((c) => (
                   <TiltBox key={c.id} style={{ padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div>
                       <strong>{c.title}</strong>
-                      <div style={{ fontSize: '12px', color: '#facc15', marginTop: '3px' }}>+{c.reward} Class Points</div>
+                      <div style={{ fontSize: '12px', color: '#facc15', marginTop: '3px' }}>+{c.reward} Class Points[cite: 1]</div>
                     </div>
                     <button disabled={c.completed} onClick={() => {
                       setChallenges(challenges.map((x) => x.id === c.id ? { ...x, completed: true } : x));
                       setClassPoints((p) => p + c.reward);
+                      setCelebrationMsg(`Challenge Completed! +${c.reward} Points credited.`);
                       setBurstCelebration(true);
                       setTimeout(() => setBurstCelebration(false), 2400);
                     }} style={{ background: c.completed ? '#1e293b' : '#10b981', color: c.completed ? '#64748b' : '#fff', border: 'none', padding: '8px 14px', borderRadius: '6px', fontWeight: 'bold', cursor: c.completed ? 'default' : 'pointer' }}>
@@ -738,13 +903,14 @@ export default function Campus360App() {
               </div>
             )}
 
+            {/* 9. CONTACTS */}
             {tab === 'contacts' && (
               <div className="stage-animate" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '14px' }}>
                 {contacts.map((c, i) => (
                   <TiltBox key={i} style={{ padding: '16px' }}>
                     <strong>{c.name}</strong>
                     <div style={{ fontSize: '12px', color: '#38bdf8', marginTop: '2px' }}>{c.title}</div>
-                    <div style={{ fontSize: '12px', color: '#94a3b8', marginTop: '4px' }}>Venue: {c.venue}</div>
+                    <div style={{ fontSize: '12px', color: '#94a3b8', marginTop: '4px' }}>Venue: {c.venue}[cite: 1]</div>
                     <div style={{ fontSize: '11px', color: '#facc15', marginTop: '2px' }}>Office Hours: {c.timing}</div>
                     <div style={{ fontSize: '11px', color: '#cbd5e1', marginTop: '4px' }} className="mono">{c.email}</div>
                   </TiltBox>
