@@ -1,9 +1,7 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 
-import App from './App.jsx'
 const INLINE_STYLES = `
   @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
-
   :root {
     --bg-base: #060913;
     --card-surface: rgba(13, 20, 38, 0.8);
@@ -13,15 +11,12 @@ const INLINE_STYLES = `
     --accent-amber: #f59e0b;
     --accent-rose: #f43f5e;
   }
-
   * { box-sizing: border-box; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
   body { margin: 0; background-color: var(--bg-base); color: #f1f5f9; overflow-x: hidden; }
   .mono { font-family: 'JetBrains Mono', monospace; }
-
   @keyframes stageIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
   @keyframes cubeRotate { 0% { transform: rotateY(0deg) rotateX(15deg); } 100% { transform: rotateY(360deg) rotateX(15deg); } }
   @keyframes flowDash { to { stroke-dashoffset: -20; } }
-
   .stage-animate { animation: stageIn 0.3s ease-out forwards; }
   .cube-holo { animation: cubeRotate 16s infinite linear; transform-style: preserve-3d; }
   .perspective-view { perspective: 1000px; }
@@ -30,7 +25,6 @@ const INLINE_STYLES = `
   .leaflet-interactive { animation: flowDash 1s linear infinite; }
 `;
 
-// --- DATA STRUCTURES ---
 const INITIAL_SUBJECTS = [
   { code: 'MATH-101', name: 'Mathematics-1', cr: 4, internal: 24, target: 'A', faculty: 'Dr. AD / Prof. KD', confidence: 75 },
   { code: 'ES-102', name: 'Engineering Science', cr: 3, internal: 22, target: 'A', faculty: 'Dr. PB / Prof. SRM', confidence: 80 },
@@ -74,7 +68,7 @@ const ROUTES = {
 
 const STUDY_MATERIALS = [
   { id: 1, title: 'Calculus & Multiple Integrals Formula Vault', sub: 'MATH-101', type: 'Formula Sheet', size: '2.4 MB', author: 'Dr. AD' },
-  { id: 2, title: 'BEE AC Circuit Theorems & Phasor Analysis Solved Papers', sub: 'BEE-103', type: 'PYQ Solutions', size: '5.1 MB', author: 'Prof. SHK' },
+  { id: 2, title: 'BEE AC Circuit Theorems Solved Papers', sub: 'BEE-103', type: 'PYQ Solutions', size: '5.1 MB', author: 'Prof. SHK' },
   { id: 3, title: 'Programming in C Pointers & Structs Manual', sub: 'CP-104', type: 'Lab Manual', size: '3.8 MB', author: 'Prof. SU' },
   { id: 4, title: 'Engineering Physics & Chem High-Yield Notes', sub: 'ES-102', type: 'Lecture Notes', size: '4.2 MB', author: 'Dr. PB' },
   { id: 5, title: 'Orthographic & Isometric Projection Sheets', sub: 'EVL-105', type: 'CAD Drawings', size: '8.6 MB', author: 'Prof. VS' }
@@ -112,7 +106,6 @@ export default function Campus360App() {
   const [phone, setPhone] = useState('');
   const [div, setDiv] = useState('D5A');
 
-  // Live OTP State
   const [otpStage, setOtpStage] = useState('phone');
   const [generatedOtp, setGeneratedOtp] = useState('');
   const [enteredOtp, setEnteredOtp] = useState(['', '', '', '']);
@@ -120,32 +113,26 @@ export default function Campus360App() {
   const [otpNotification, setOtpNotification] = useState(null);
   const [otpError, setOtpError] = useState('');
 
-  // Navigation
   const [tab, setTab] = useState('desktop');
   const [activeRoute, setActiveRoute] = useState('campus');
   const [resourceFilter, setResourceFilter] = useState('All');
-  const [contactQuery, setContactQuery] = useState('');
 
-  // Personalized Academic Planner State
   const [subjects, setSubjects] = useState(INITIAL_SUBJECTS);
   const [personalTargetSGPA, setPersonalTargetSGPA] = useState(8.8);
   const [timeCredits, setTimeCredits] = useState(4);
   const [classPoints, setClassPoints] = useState(175);
   const [burstCelebration, setBurstCelebration] = useState(false);
 
-  // Map Refs
   const mapRef = useRef(null);
   const mapInstance = useRef(null);
   const layerGroup = useRef(null);
 
-  // Rides State
   const [rides, setRides] = useState([
-    { id: 1, driver: 'Aarav Mehta', role: 'Student', route: 'Chembur Station → VESIT Gate 1', time: '08:15 AM', seats: 1, pickup: 'Auto Stand Pl. 1', booked: false },
-    { id: 2, driver: 'Prof. S. H. Kulkarni', role: 'Teacher', route: 'Kurla Station East → VESIT Staff Parking', time: '08:30 AM', seats: 3, pickup: 'Kurla East Bus Depot', booked: false }
+    { id: 1, driver: 'Aarav Mehta', role: 'Student', route: 'Chembur Station -> VESIT Gate 1', time: '08:15 AM', seats: 1, pickup: 'Auto Stand Pl. 1', booked: false },
+    { id: 2, driver: 'Prof. S. H. Kulkarni', role: 'Teacher', route: 'Kurla Station East -> VESIT Staff Parking', time: '08:30 AM', seats: 3, pickup: 'Kurla East Bus Depot', booked: false }
   ]);
-  const [newRide, setNewRide] = useState({ route: 'Chembur Station → VESIT Gate 1', time: '08:30 AM', seats: 2, pickup: 'Main Gate 1' });
+  const [newRide, setNewRide] = useState({ route: 'Chembur Station -> VESIT Gate 1', time: '08:30 AM', seats: 2, pickup: 'Main Gate 1' });
 
-  // Events & Challenges
   const [events, setEvents] = useState([
     { id: 1, title: 'VESIT Annual Hackathon: QuestIT 2026', org: 'IT Dept & CSI', date: 'Oct 24, 09:00 AM', venue: 'Amphitheatre', stage: 'Registration Open', registered: true },
     { id: 2, title: 'Freshers Git & Linux Boot Camp', org: 'Tinkers Club', date: 'Oct 19, 04:00 PM', venue: 'CC Lab 10A', stage: 'Starting Soon', registered: false },
@@ -164,7 +151,6 @@ export default function Campus360App() {
     { name: 'Dr. P. Bisen (PB)', role: 'Faculty', title: 'FE First Year Coordinator', venue: 'Science Wing Lab 503', timing: 'Mon-Fri 10-11 AM', email: 'p.bisen@ves.ac.in' }
   ];
 
-  // OTP Timer
   useEffect(() => {
     let interval = null;
     if (otpTimer > 0) interval = setInterval(() => setOtpTimer((t) => t - 1), 1000);
@@ -211,7 +197,6 @@ export default function Campus360App() {
     }
   };
 
-  // Map Setup
   useEffect(() => {
     if (tab !== 'map') return;
     if (!document.getElementById('leaflet-css')) {
@@ -266,7 +251,6 @@ export default function Campus360App() {
     map.fitBounds(layerGroup.current.getBounds(), { padding: [40, 40] });
   };
 
-  // --- PERSONALIZED SGPA & PROBABILITY ENGINE ---
   const personalizedAnalytics = useMemo(() => {
     let totalCredits = 0;
     let earnedGradePoints = 0;
@@ -275,7 +259,6 @@ export default function Campus360App() {
       totalCredits += sub.cr;
       const targetMinMarks = CUTOFFS[sub.target] || 40;
       const neededInEndSem = Math.max(0, targetMinMarks - sub.internal);
-
       const difficulty = (neededInEndSem / 70) * 100;
       const prob = Math.max(5, Math.min(99, Math.round(sub.confidence * 1.2 - difficulty * 0.48)));
 
@@ -333,7 +316,6 @@ export default function Campus360App() {
     <>
       <style>{INLINE_STYLES}</style>
 
-      {/* Live Toast Simulator */}
       {otpNotification && (
         <div style={{ position: 'fixed', top: '16px', left: '50%', transform: 'translateX(-50%)', zIndex: 9999, background: '#111827', border: '1px solid #38bdf8', padding: '14px 20px', borderRadius: '14px', display: 'flex', alignItems: 'center', gap: '14px', boxShadow: '0 10px 30px rgba(0,0,0,0.8)' }}>
           <div>
@@ -346,14 +328,12 @@ export default function Campus360App() {
         </div>
       )}
 
-      {/* Points Celebration Banner */}
       {burstCelebration && (
         <div style={{ position: 'fixed', top: '24px', left: '50%', transform: 'translateX(-50%)', zIndex: 9999, background: 'linear-gradient(135deg, #10b981, #0284c7)', color: '#fff', padding: '10px 24px', borderRadius: '30px', fontWeight: 'bold', fontSize: '13px', boxShadow: '0 0 25px rgba(16,185,129,0.7)' }}>
-          🎉 Action Complete! +20 Class Points rewarded.
+          Action Complete! +20 Class Points rewarded.
         </div>
       )}
 
-      {/* --- AUTHENTICATION SCREEN --- */}
       {!session ? (
         <div style={{ display: 'grid', placeItems: 'center', minHeight: '100vh', padding: '20px' }}>
           <div className="perspective-view" style={{ width: '100%', maxWidth: '390px' }}>
@@ -366,7 +346,7 @@ export default function Campus360App() {
               </div>
               <div style={{ textAlign: 'center', marginBottom: '20px' }}>
                 <h2 style={{ margin: 0, fontSize: '24px', fontWeight: '800' }}>Campus<span style={{ color: '#38bdf8' }}>360</span></h2>
-                <small style={{ color: '#94a3b8' }}>VESIT Identity & Academic Portal[cite: 1, 2]</small>
+                <small style={{ color: '#94a3b8' }}>VESIT Identity & Academic Portal</small>
               </div>
 
               <div style={{ display: 'flex', background: '#070b14', padding: '4px', borderRadius: '10px', marginBottom: '16px', border: '1px solid #1e293b' }}>
@@ -390,7 +370,7 @@ export default function Campus360App() {
                     <input required type="text" placeholder="Faculty Name" value={identifier} onChange={(e) => setIdentifier(e.target.value)} style={{ padding: '10px', background: '#070b14', color: '#fff', borderRadius: '8px', border: '1px solid #334155' }} />
                   )}
                   <input required type="tel" placeholder="Mobile Number (10 Digits)" value={phone} onChange={(e) => setPhone(e.target.value)} style={{ padding: '10px', background: '#070b14', color: '#fff', borderRadius: '8px', border: '1px solid #334155' }} />
-                  <button type="submit" style={{ background: '#0284c7', color: '#fff', border: 'none', padding: '12px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>Send SMS OTP →[cite: 1, 2]</button>
+                  <button type="submit" style={{ background: '#0284c7', color: '#fff', border: 'none', padding: '12px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>Send SMS OTP</button>
                 </form>
               ) : (
                 <form onSubmit={handleVerifyOtp} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
@@ -399,15 +379,14 @@ export default function Campus360App() {
                       <input key={i} id={`otp-${i}`} type="text" maxLength="1" value={enteredOtp[i]} onChange={(e) => handleOtpInput(i, e.target.value)} className="mono" style={{ width: '50px', height: '52px', textAlign: 'center', fontSize: '20px', fontWeight: 'bold', background: '#070b14', color: '#38bdf8', border: '1px solid #334155', borderRadius: '8px' }} />
                     ))}
                   </div>
-                  <button type="submit" style={{ background: '#10b981', color: '#fff', border: 'none', padding: '12px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>Verify & Enter ✓</button>
-                  <button type="button" onClick={() => setOtpStage('phone')} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', fontSize: '12px' }}>← Edit Phone</button>
+                  <button type="submit" style={{ background: '#10b981', color: '#fff', border: 'none', padding: '12px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>Verify & Enter</button>
+                  <button type="button" onClick={() => setOtpStage('phone')} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', fontSize: '12px' }}>Edit Phone</button>
                 </form>
               )}
             </TiltBox>
           </div>
         </div>
       ) : (
-        /* --- MAIN DESKTOP PORTAL --- */
         <div style={{ minHeight: '100vh' }}>
           <header style={{ background: 'rgba(10, 16, 32, 0.85)', backdropFilter: 'blur(16px)', padding: '12px 28px', borderBottom: '1px solid rgba(56, 189, 248, 0.15)', position: 'sticky', top: 0, zIndex: 100, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
@@ -416,23 +395,22 @@ export default function Campus360App() {
               <div style={{ fontSize: '11px', color: '#94a3b8' }}>{session.name} ({session.idTag})</div>
             </div>
             <div style={{ display: 'flex', gap: '14px', alignItems: 'center' }}>
-              <span style={{ color: '#38bdf8', fontSize: '13px' }}>⏳ <strong>{timeCredits}</strong> Credits[cite: 1]</span>
-              <span style={{ color: '#facc15', fontSize: '13px' }}>🏆 <strong>{classPoints}</strong> Pts[cite: 1]</span>
+              <span style={{ color: '#38bdf8', fontSize: '13px' }}>Time Credits: <strong>{timeCredits}</strong></span>
+              <span style={{ color: '#facc15', fontSize: '13px' }}>Class Pts: <strong>{classPoints}</strong></span>
               <button onClick={() => setSession(null)} style={{ background: '#1e293b', border: '1px solid #334155', color: '#cbd5e1', padding: '5px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '12px' }}>Exit</button>
             </div>
           </header>
 
-          {/* Navigation Bar */}
           <nav style={{ display: 'flex', gap: '8px', padding: '10px 28px', background: '#070b14', borderBottom: '1px solid rgba(255,255,255,0.05)', overflowX: 'auto' }}>
             {[
-              { id: 'desktop', label: '🖥️ Main Desktop Dashboard' },
-              { id: 'academic', label: '📊 Personalized SGPA Calculator' },
-              { id: 'resources', label: '📚 Study Vault' },
-              { id: 'rides', label: '🚗 Ride Creation' },
-              { id: 'map', label: '🗺️ Campus & Routes' },
-              { id: 'events', label: '🎟️ Events' },
-              { id: 'challenges', label: '🏅 Challenges' },
-              { id: 'contacts', label: '📞 Contacts' }
+              { id: 'desktop', label: 'Main Dashboard' },
+              { id: 'academic', label: 'Personalized SGPA Calculator' },
+              { id: 'resources', label: 'Study Vault' },
+              { id: 'rides', label: 'Ride Creation' },
+              { id: 'map', label: 'Campus & Routes' },
+              { id: 'events', label: 'Events' },
+              { id: 'challenges', label: 'Challenges' },
+              { id: 'contacts', label: 'Contacts' }
             ].map((t) => (
               <button key={t.id} onClick={() => setTab(t.id)} style={{ background: tab === t.id ? '#0284c7' : 'transparent', color: tab === t.id ? '#fff' : '#94a3b8', border: tab === t.id ? '1px solid #38bdf8' : 'none', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', fontSize: '13px', fontWeight: tab === t.id ? 'bold' : 'normal', whiteSpace: 'nowrap' }}>
                 {t.label}
@@ -442,39 +420,35 @@ export default function Campus360App() {
 
           <main style={{ maxWidth: '1080px', margin: '24px auto', padding: '0 16px' }} className="perspective-view">
             
-            {/* 1. RESTORED FULL DESKTOP DASHBOARD */}
             {tab === 'desktop' && (
               <div className="stage-animate" style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
-                {/* Attention Radar Card */}
                 <TiltBox style={{ padding: '22px', borderLeft: '6px solid #f43f5e', border: '1px solid rgba(244,63,94,0.3)' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
                     <div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <span style={{ fontSize: '18px' }}>🚨</span>
-                        <h3 style={{ margin: 0, color: '#f8fafc', fontSize: '17px' }}>Academic Attention Radar[cite: 1]</h3>
+                        <h3 style={{ margin: 0, color: '#f8fafc', fontSize: '17px' }}>Academic Attention Radar</h3>
                         <span style={{ fontSize: '11px', background: 'rgba(244,63,94,0.2)', color: '#f87171', padding: '2px 8px', borderRadius: '10px', fontWeight: 'bold' }}>
                           {personalizedAnalytics.attentionCount} Modules At Risk
                         </span>
                       </div>
                       <p style={{ margin: '4px 0 0', fontSize: '13px', color: '#cbd5e1' }}>
                         {personalizedAnalytics.attentionCount > 0
-                          ? 'BEE-103 requires high End-Sem cutoff. Check your Personalized SGPA Calculator for targeted what-if marks.'[cite: 1]
-                          : 'All modules are on track for your personalized SGPA target!'[cite: 1]}
+                          ? 'BEE-103 requires high End-Sem cutoff. Check your Personalized SGPA Calculator for targeted what-if marks.'
+                          : 'All modules are on track for your personalized SGPA target!'}
                       </p>
                     </div>
                     <div style={{ display: 'flex', gap: '8px' }}>
-                      <button onClick={() => setTab('academic')} style={{ background: '#1e293b', border: '1px solid #334155', color: '#fff', padding: '8px 14px', borderRadius: '8px', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}>SGPA Calculator →</button>
+                      <button onClick={() => setTab('academic')} style={{ background: '#1e293b', border: '1px solid #334155', color: '#fff', padding: '8px 14px', borderRadius: '8px', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}>SGPA Calculator</button>
                       <button onClick={() => setTab('resources')} style={{ background: '#0284c7', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}>Study Vault</button>
                     </div>
                   </div>
                 </TiltBox>
 
-                {/* Desktop High-Level Metrics */}
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '14px' }}>
                   <TiltBox style={{ padding: '18px' }}>
                     <div style={{ fontSize: '11px', color: '#94a3b8', fontWeight: 'bold' }}>PROJECTED SGPA</div>
                     <div style={{ fontSize: '28px', fontWeight: 'bold', color: personalizedAnalytics.isGoalMet ? '#10b981' : '#f59e0b', marginTop: '4px' }} className="mono">
-                      {personalizedAnalytics.projectedSGPA}[cite: 1]
+                      {personalizedAnalytics.projectedSGPA}
                     </div>
                     <small style={{ color: '#94a3b8', fontSize: '11px' }}>Goal: {personalTargetSGPA} SGPA</small>
                   </TiltBox>
@@ -490,40 +464,37 @@ export default function Campus360App() {
                   <TiltBox style={{ padding: '18px' }}>
                     <div style={{ fontSize: '11px', color: '#94a3b8', fontWeight: 'bold' }}>PEER TIME CREDITS</div>
                     <div style={{ fontSize: '28px', fontWeight: 'bold', color: '#38bdf8', marginTop: '4px' }} className="mono">
-                      {timeCredits} hrs[cite: 1]
+                      {timeCredits} hrs
                     </div>
-                    <small style={{ color: '#94a3b8', fontSize: '11px' }}>1 hr taught = +1 credit[cite: 1, 3]</small>
+                    <small style={{ color: '#94a3b8', fontSize: '11px' }}>1 hr taught = +1 credit</small>
                   </TiltBox>
 
                   <TiltBox style={{ padding: '18px' }}>
                     <div style={{ fontSize: '11px', color: '#94a3b8', fontWeight: 'bold' }}>OPEN CAMPUS RIDES</div>
                     <div style={{ fontSize: '28px', fontWeight: 'bold', color: '#facc15', marginTop: '4px' }} className="mono">
-                      {rides.length} Available[cite: 1]
+                      {rides.length} Available
                     </div>
                     <small style={{ color: '#38bdf8', fontSize: '11px' }}>Chembur & Kurla stations</small>
                   </TiltBox>
                 </div>
 
-                {/* Desktop Split Schedules & Active Tasks */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-                  {/* Today's Lectures */}
                   <TiltBox style={{ padding: '20px' }}>
-                    <h3 style={{ margin: '0 0 12px', fontSize: '16px', color: '#38bdf8' }}>📅 Today's Lecture Schedule ({div})</h3>
+                    <h3 style={{ margin: '0 0 12px', fontSize: '16px', color: '#38bdf8' }}>Today's Lecture Schedule ({div})</h3>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                       {(SCHEDULE[div] || SCHEDULE.D5A).map((p, idx) => (
                         <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 12px', background: '#070b14', borderRadius: '8px', border: '1px solid #1e293b' }}>
-                          <span>⏰ <strong>{p.time}</strong> — {p.sub}</span>
-                          <span style={{ color: '#38bdf8' }}>📍 {p.room}</span>
+                          <span><strong>{p.time}</strong> — {p.sub}</span>
+                          <span style={{ color: '#38bdf8' }}>{p.room}</span>
                         </div>
                       ))}
                     </div>
                   </TiltBox>
 
-                  {/* Active Commute Pool */}
                   <TiltBox style={{ padding: '20px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                      <h3 style={{ margin: 0, fontSize: '16px', color: '#f8fafc' }}>🚗 Active Campus Pools</h3>
-                      <button onClick={() => setTab('rides')} style={{ background: 'none', border: 'none', color: '#38bdf8', fontSize: '12px', cursor: 'pointer', fontWeight: 'bold' }}>View All →</button>
+                      <h3 style={{ margin: 0, fontSize: '16px', color: '#f8fafc' }}>Active Campus Pools</h3>
+                      <button onClick={() => setTab('rides')} style={{ background: 'none', border: 'none', color: '#38bdf8', fontSize: '12px', cursor: 'pointer', fontWeight: 'bold' }}>View All</button>
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                       {rides.slice(0, 3).map((r) => (
@@ -541,7 +512,6 @@ export default function Campus360App() {
               </div>
             )}
 
-            {/* 2. FULLY PERSONALIZED SGPA CALCULATOR */}
             {tab === 'academic' && (
               <div className="stage-animate" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 <TiltBox style={{ padding: '24px' }}>
@@ -549,11 +519,10 @@ export default function Campus360App() {
                     <div>
                       <h2 style={{ margin: 0, color: '#f8fafc', fontSize: '20px' }}>Personalized SGPA & What-If Calculator</h2>
                       <p style={{ margin: '4px 0 0', fontSize: '13px', color: '#94a3b8' }}>
-                        Customize your internal marks (/30), desired grade, and exam confidence to forecast required End-Sem scores (/70)[cite: 1, 2].
+                        Customize your internal marks (/30), desired grade, and exam confidence to forecast required End-Sem scores (/70).
                       </p>
                     </div>
 
-                    {/* Dynamic Goal Setter */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px', background: '#070b14', padding: '8px 16px', borderRadius: '10px', border: '1px solid #334155' }}>
                       <span style={{ fontSize: '12px', color: '#94a3b8' }}>Target Goal:</span>
                       <input
@@ -567,12 +536,11 @@ export default function Campus360App() {
                         style={{ width: '60px', padding: '6px', background: '#0b1324', color: '#38bdf8', border: '1px solid #0284c7', borderRadius: '6px', fontWeight: 'bold', textAlign: 'center' }}
                       />
                       <span style={{ fontSize: '12px', color: personalizedAnalytics.isGoalMet ? '#10b981' : '#f59e0b', fontWeight: 'bold' }}>
-                        {personalizedAnalytics.isGoalMet ? 'Goal Met ✓' : 'Under Goal'}
+                        {personalizedAnalytics.isGoalMet ? 'Goal Met' : 'Under Goal'}
                       </span>
                     </div>
                   </div>
 
-                  {/* Individual Course Cards */}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                     {personalizedAnalytics.analyzed.map((sub, idx) => (
                       <div
@@ -591,7 +559,6 @@ export default function Campus360App() {
                             <div style={{ fontSize: '12px', color: '#94a3b8', marginTop: '2px' }}>Faculty: {sub.faculty}</div>
                           </div>
 
-                          {/* Editable Controls */}
                           <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
                             <div>
                               <span style={{ fontSize: '11px', color: '#94a3b8', display: 'block' }}>Internals (/30):</span>
@@ -624,7 +591,7 @@ export default function Campus360App() {
 
                             <div style={{ textAlign: 'right', minWidth: '130px' }}>
                               <div style={{ color: sub.color, fontWeight: 'bold', fontSize: '13px' }}>
-                                Need: {sub.neededInEndSem}/70[cite: 1]
+                                Need: {sub.neededInEndSem}/70
                               </div>
                               <span style={{ fontSize: '11px', color: sub.achievable ? '#10b981' : '#f43f5e' }}>
                                 {sub.achievable ? `Probability: ${sub.prob}%` : 'Impossible (>70)'}
@@ -633,7 +600,6 @@ export default function Campus360App() {
                           </div>
                         </div>
 
-                        {/* Prep Confidence Slider */}
                         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '12px' }}>
                           <span style={{ fontSize: '11px', color: '#64748b' }}>Prep Confidence:</span>
                           <input
@@ -657,7 +623,6 @@ export default function Campus360App() {
               </div>
             )}
 
-            {/* 3. STUDY VAULT */}
             {tab === 'resources' && (
               <div className="stage-animate" style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                 <TiltBox style={{ padding: '20px' }}>
@@ -676,7 +641,7 @@ export default function Campus360App() {
                           <strong>{res.title}</strong>
                           <div style={{ fontSize: '11px', color: '#94a3b8', marginTop: '3px' }}>{res.sub} • Verified by {res.author} • {res.size}</div>
                         </div>
-                        <button onClick={() => alert(`Starting download for ${res.title}`)} style={{ background: '#1e293b', color: '#38bdf8', border: '1px solid #334155', padding: '6px 14px', borderRadius: '6px', fontSize: '12px', fontWeight: 'bold', cursor: 'pointer' }}>Download 📥</button>
+                        <button onClick={() => alert(`Starting download for ${res.title}`)} style={{ background: '#1e293b', color: '#38bdf8', border: '1px solid #334155', padding: '6px 14px', borderRadius: '6px', fontSize: '12px', fontWeight: 'bold', cursor: 'pointer' }}>Download</button>
                       </div>
                     ))}
                   </div>
@@ -684,20 +649,19 @@ export default function Campus360App() {
               </div>
             )}
 
-            {/* 4. RIDE CREATION */}
             {tab === 'rides' && (
               <div className="stage-animate" style={{ display: 'grid', gridTemplateColumns: 'minmax(300px, 340px) 1fr', gap: '20px', alignItems: 'start' }}>
                 <TiltBox style={{ padding: '20px' }}>
-                  <h3 style={{ margin: '0 0 12px', color: '#38bdf8' }}>🚗 Offer a Campus Ride[cite: 1]</h3>
+                  <h3 style={{ margin: '0 0 12px', color: '#38bdf8' }}>Offer a Campus Ride</h3>
                   <form onSubmit={handlePublishRide} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                     <select value={newRide.route} onChange={(e) => setNewRide({ ...newRide, route: e.target.value })} style={{ padding: '10px', background: '#070b14', color: '#fff', border: '1px solid #334155', borderRadius: '8px' }}>
-                      <option value="Chembur Station → VESIT Gate 1">Chembur Station → VESIT Gate 1</option>
-                      <option value="Kurla Station East → VESIT Gate 1">Kurla Station East → VESIT Gate 1</option>
+                      <option value="Chembur Station -> VESIT Gate 1">Chembur Station -> VESIT Gate 1</option>
+                      <option value="Kurla Station East -> VESIT Gate 1">Kurla Station East -> VESIT Gate 1</option>
                     </select>
                     <input required type="text" placeholder="Departure Time (e.g. 08:30 AM)" value={newRide.time} onChange={(e) => setNewRide({ ...newRide, time: e.target.value })} style={{ padding: '10px', background: '#070b14', color: '#fff', border: '1px solid #334155', borderRadius: '8px' }} />
                     <input required type="text" placeholder="Pickup Landmark" value={newRide.pickup} onChange={(e) => setNewRide({ ...newRide, pickup: e.target.value })} style={{ padding: '10px', background: '#070b14', color: '#fff', border: '1px solid #334155', borderRadius: '8px' }} />
                     <input type="number" min="1" max="4" value={newRide.seats} onChange={(e) => setNewRide({ ...newRide, seats: e.target.value })} style={{ padding: '10px', background: '#070b14', color: '#fff', border: '1px solid #334155', borderRadius: '8px' }} />
-                    <button type="submit" style={{ background: '#0284c7', color: '#fff', border: 'none', padding: '10px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>Publish Ride (+20 Pts)[cite: 1]</button>
+                    <button type="submit" style={{ background: '#0284c7', color: '#fff', border: 'none', padding: '10px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>Publish Ride (+20 Pts)</button>
                   </form>
                 </TiltBox>
 
@@ -706,11 +670,11 @@ export default function Campus360App() {
                     <TiltBox key={r.id} style={{ padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <div>
                         <strong>{r.route}</strong>
-                        <div style={{ fontSize: '12px', color: '#cbd5e1', marginTop: '2px' }}>{r.driver} ({r.role}) • {r.time} • 📍 {r.pickup}</div>
+                        <div style={{ fontSize: '12px', color: '#cbd5e1', marginTop: '2px' }}>{r.driver} ({r.role}) • {r.time} • {r.pickup}</div>
                         <div style={{ fontSize: '11px', color: r.seats > 0 ? '#10b981' : '#f43f5e', marginTop: '4px' }}>{r.seats > 0 ? `${r.seats} seats available` : 'Full'}</div>
                       </div>
                       <button onClick={() => setRides(rides.map((x) => x.id === r.id ? { ...x, booked: !x.booked, seats: x.booked ? x.seats + 1 : x.seats - 1 } : x))} style={{ background: r.booked ? '#f43f5e' : '#0284c7', color: '#fff', border: 'none', padding: '8px 14px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>
-                        {r.booked ? 'Cancel' : 'Request Seat[cite: 1]'}
+                        {r.booked ? 'Cancel' : 'Request Seat'}
                       </button>
                     </TiltBox>
                   ))}
@@ -718,14 +682,13 @@ export default function Campus360App() {
               </div>
             )}
 
-            {/* 5. MAPS & NAVIGATION */}
             {tab === 'map' && (
               <div className="stage-animate" style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                 <TiltBox style={{ padding: '20px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', flexWrap: 'wrap', gap: '10px' }}>
                     <h3 style={{ margin: 0, color: '#38bdf8' }}>VESIT Real-Time Navigation</h3>
                     <div style={{ display: 'flex', gap: '6px' }}>
-                      <button onClick={() => { setActiveRoute('campus'); renderRoute('campus'); }} style={{ background: activeRoute === 'campus' ? '#0284c7' : '#070b14', color: '#fff', border: '1px solid #334155', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}>🏫 Campus</button>
+                      <button onClick={() => { setActiveRoute('campus'); renderRoute('campus'); }} style={{ background: activeRoute === 'campus' ? '#0284c7' : '#070b14', color: '#fff', border: '1px solid #334155', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}>Campus</button>
                       <button onClick={() => { setActiveRoute('chembur'); renderRoute('chembur'); }} style={{ background: activeRoute === 'chembur' ? '#38bdf8' : '#070b14', color: activeRoute === 'chembur' ? '#000' : '#fff', border: '1px solid #334155', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}>Chembur Stn</button>
                       <button onClick={() => { setActiveRoute('kurla'); renderRoute('kurla'); }} style={{ background: activeRoute === 'kurla' ? '#f59e0b' : '#070b14', color: activeRoute === 'kurla' ? '#000' : '#fff', border: '1px solid #334155', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}>Kurla Stn</button>
                     </div>
@@ -738,7 +701,6 @@ export default function Campus360App() {
               </div>
             )}
 
-            {/* 6. EVENTS */}
             {tab === 'events' && (
               <div className="stage-animate" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 {events.map((ev) => (
@@ -748,21 +710,20 @@ export default function Campus360App() {
                       <div style={{ fontSize: '12px', color: '#94a3b8', marginTop: '3px' }}>{ev.org} • {ev.venue} • {ev.date}</div>
                     </div>
                     <button onClick={() => setEvents(events.map((e) => e.id === ev.id ? { ...e, registered: !e.registered } : e))} style={{ background: ev.registered ? '#1e293b' : '#0284c7', color: ev.registered ? '#38bdf8' : '#fff', border: 'none', padding: '8px 14px', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer' }}>
-                      {ev.registered ? 'Registered ✓' : 'Register'}
+                      {ev.registered ? 'Registered' : 'Register'}
                     </button>
                   </TiltBox>
                 ))}
               </div>
             )}
 
-            {/* 7. CHALLENGES */}
             {tab === 'challenges' && (
               <div className="stage-animate" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 {challenges.map((c) => (
                   <TiltBox key={c.id} style={{ padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div>
                       <strong>{c.title}</strong>
-                      <div style={{ fontSize: '12px', color: '#facc15', marginTop: '3px' }}>+{c.reward} Class Points[cite: 1]</div>
+                      <div style={{ fontSize: '12px', color: '#facc15', marginTop: '3px' }}>+{c.reward} Class Points</div>
                     </div>
                     <button disabled={c.completed} onClick={() => {
                       setChallenges(challenges.map((x) => x.id === c.id ? { ...x, completed: true } : x));
@@ -770,23 +731,22 @@ export default function Campus360App() {
                       setBurstCelebration(true);
                       setTimeout(() => setBurstCelebration(false), 2400);
                     }} style={{ background: c.completed ? '#1e293b' : '#10b981', color: c.completed ? '#64748b' : '#fff', border: 'none', padding: '8px 14px', borderRadius: '6px', fontWeight: 'bold', cursor: c.completed ? 'default' : 'pointer' }}>
-                      {c.completed ? 'Done ✓' : 'Submit'}
+                      {c.completed ? 'Done' : 'Submit'}
                     </button>
                   </TiltBox>
                 ))}
               </div>
             )}
 
-            {/* 8. CONTACTS */}
             {tab === 'contacts' && (
               <div className="stage-animate" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '14px' }}>
                 {contacts.map((c, i) => (
                   <TiltBox key={i} style={{ padding: '16px' }}>
                     <strong>{c.name}</strong>
                     <div style={{ fontSize: '12px', color: '#38bdf8', marginTop: '2px' }}>{c.title}</div>
-                    <div style={{ fontSize: '12px', color: '#94a3b8', marginTop: '4px' }}>📍 {c.venue}[cite: 1]</div>
-                    <div style={{ fontSize: '11px', color: '#facc15', marginTop: '2px' }}>⏰ {c.timing}</div>
-                    <div style={{ fontSize: '11px', color: '#cbd5e1', marginTop: '4px' }} className="mono">✉️ {c.email}</div>
+                    <div style={{ fontSize: '12px', color: '#94a3b8', marginTop: '4px' }}>Venue: {c.venue}</div>
+                    <div style={{ fontSize: '11px', color: '#facc15', marginTop: '2px' }}>Office Hours: {c.timing}</div>
+                    <div style={{ fontSize: '11px', color: '#cbd5e1', marginTop: '4px' }} className="mono">{c.email}</div>
                   </TiltBox>
                 ))}
               </div>
